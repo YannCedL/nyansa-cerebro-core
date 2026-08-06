@@ -24,3 +24,5 @@ def run_investigation(entity: str, query_types: list = None) -> ResultContract:
         value="nyansa_aggregation", source="nyansa_orchestrator",
         observed_at=now, confidence=0.95, status=EpistemicStatus.FACT))
     return contract
+
+# mirror media platform connected
