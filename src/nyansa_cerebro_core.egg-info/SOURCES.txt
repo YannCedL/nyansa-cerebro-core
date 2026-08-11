@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/nyansa_cerebro_core/__init__.py
+src/nyansa_cerebro_core/api.py
+src/nyansa_cerebro_core/contradiction_detector.py
+src/nyansa_cerebro_core/evidence_graph.py
+src/nyansa_cerebro_core/orchestrator.py
+src/nyansa_cerebro_core/planner.py
+src/nyansa_cerebro_core/reasoning.py
+src/nyansa_cerebro_core/registry.py
+src/nyansa_cerebro_core.egg-info/PKG-INFO
+src/nyansa_cerebro_core.egg-info/SOURCES.txt
+src/nyansa_cerebro_core.egg-info/dependency_links.txt
+src/nyansa_cerebro_core.egg-info/requires.txt
+src/nyansa_cerebro_core.egg-info/top_level.txt
+tests/test_nyansa.py
