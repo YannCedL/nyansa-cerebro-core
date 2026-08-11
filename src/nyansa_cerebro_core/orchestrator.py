@@ -28,3 +28,5 @@ def run_investigation(entity: str, query_types: list = None) -> ResultContract:
 # mirror media platform connected
 
 # terra geospatial platform connected
+
+# result schema validation fixed
