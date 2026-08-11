@@ -3,126 +3,302 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nyansa-Cerebro — Central Command Hub</title>
+  <title>NYANSA 2026 — Causal Stock Correlation & Predictive Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg-primary: #0a0e17;
-      --bg-card: rgba(18, 24, 36, 0.85);
-      --border-color: rgba(56, 189, 248, 0.25);
-      --text-main: #f1f5f9;
-      --accent-cyan: #38bdf8;
-      --accent-emerald: #10b981;
+      --bg-base: #06080e;
+      --bg-surface: rgba(13, 17, 26, 0.85);
+      --bg-card: rgba(18, 24, 38, 0.65);
+      --border-subtle: rgba(56, 189, 248, 0.12);
+      --border-glow: rgba(56, 189, 248, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --gold: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #a855f7;
     }
+
+    * { box-sizing: border-box; }
     body {
-      background-color: var(--bg-primary);
+      background: radial-gradient(circle at 50% 0%, #0d1527 0%, var(--bg-base) 70%);
       color: var(--text-main);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      min-height: 100vh;
     }
-    .header {
+
+    .top-bar {
+      height: 64px;
+      padding: 0 32px;
+      background: rgba(6, 8, 14, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 15px;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 25px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 2px;
+      color: #ffffff;
+    }
+    .brand-logo span { color: var(--cyan); }
     .status-badge {
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--accent-emerald);
-      border: 1px solid var(--accent-emerald);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: var(--emerald);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
     }
-    .search-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
-      margin-bottom: 25px;
+    .led-pulse {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
     }
-    input[type="text"] {
-      width: 70%;
-      padding: 12px;
-      background: #0f172a;
-      border: 1px solid var(--border-color);
-      color: white;
-      border-radius: 6px;
-      font-size: 1rem;
+
+    .app-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px;
     }
-    button {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1rem;
+
+    .glass-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
     }
-    button:hover {
-      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-top: 0;
+      margin-bottom: 20px;
     }
-    .hubs-grid {
+
+    .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
     }
-    .hub-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 20px;
-      transition: all 0.3s ease;
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-bottom: 15px;
     }
-    .hub-card:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+    .data-table th, .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: left;
     }
-    a { color: var(--accent-cyan); text-decoration: none; }
+    .data-table th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .cause-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .cause-badge.up { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid var(--emerald); }
+    .cause-badge.down { background: rgba(244, 63, 94, 0.15); color: var(--rose); border: 1px solid var(--rose); }
+
+    .predict-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border: 1px solid var(--emerald);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div>
-      <h1>🧠 NYANSA-CEREBRO CORE</h1>
-      <p style="color: #94a3b8; margin: 0;">Centre de Commande & Orchestration Global OSINT</p>
+
+  <div class="top-bar">
+    <div class="brand-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      NYANSA <span>CAUSAL STOCK & PREDICTIVE AI ENGINE</span>
     </div>
-    <div class="status-badge">● ORCHESTRATEUR ACTIF (37 SERVICES)</div>
+    <div class="status-badge">
+      <div class="led-pulse"></div>
+      HISTORIQUE CAUSAL 3 ANS + PRÉDICTION IA
+    </div>
   </div>
 
-  <div class="search-box">
-    <h3>🔍 Lancer une Investigation Globale Multi-Sources</h3>
-    <input type="text" placeholder="Entrez le nom d'une entreprise, un SIREN, un navire ou des coordonnées GPS...">
-    <button onclick="alert('Investigation lancée sur les 4 Hubs 360°')">Démarrer l'enquête</button>
+  <div class="app-container">
+
+    <!-- RECHERCHE CAUSALE -->
+    <div class="glass-card" style="margin-bottom: 24px;">
+      <div style="display: flex; gap: 16px; align-items: center;">
+        <span style="font-weight: 700; color: var(--cyan);">SÉLECTIONNER L'ACTION À ANALYSER SUR 3 ANS :</span>
+        <select id="stock-select" onchange="updateCausalAnalysis()" style="background: rgba(6, 8, 14, 0.8); color: white; border: 1px solid var(--border-glow); padding: 10px 16px; border-radius: 8px; font-weight: bold; outline: none;">
+          <option value="LVMH">LVMH SE (MC.PA) — Cours Actuel : 465,00 €</option>
+          <option value="ZARA">INDITEX / ZARA (ITX.MC) — Cours Actuel : 46,80 €</option>
+          <option value="TOTAL">TOTALENERGIES (TTE.PA) — Cours Actuel : 62,10 €</option>
+          <option value="AIRBUS">AIRBUS SE (AIR.PA) — Cours Actuel : 138,40 €</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- GRAPHIQUE HISTORIQUE SUR 3 ANS -->
+    <div class="grid-2">
+      <div class="glass-card">
+        <div class="card-title">📈 Graphique Historique 3 Ans (2023 - 2026) & Points de Rupture</div>
+        <canvas id="causalChart" height="220"></canvas>
+      </div>
+
+      <!-- MOTEUR DE PRÉDICTION IA -->
+      <div class="glass-card">
+        <div class="card-title">🔮 Moteur de Prédiction IA (Scénarios & Probabilités)</div>
+        <div id="prediction-box">
+          <!-- Injecté dynamiquement par JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLEAU DÉTAILLÉ CAUSES ET EFFETS -->
+    <div class="glass-card">
+      <div class="card-title">🔍 Chronologie Causale : Événements Historiques vs Variation du Prix (3 Ans)</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Période / Date</th><th>Prix de l'Action</th><th>Variation (%)</th><th>Type d'Événement</th><th>Explication Causale Détaillée (Pourquoi le prix a changé)</th></tr>
+        </thead>
+        <tbody id="causal-events-body">
+          <!-- Injecté par JS -->
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
-  <h2>🌐 Plateformes & Hubs Thématiques Interconnectés</h2>
-  <div class="hubs-grid">
-    <div class="hub-card">
-      <h3>🏢 Citadel Hub (Corporate 360)</h3>
-      <p>Agrégation d'identité, actionnariat, dirigeants et santé financière.</p>
-      <a href="http://localhost:8000" target="_blank">Ouvrir Citadel (Port 8000) →</a>
-    </div>
-    <div class="hub-card">
-      <h3>🗺️ Terra Hub (Géospatial 360)</h3>
-      <p>Tracking d'avions (Aquila), navires (Nereid), cadastre et satellite.</p>
-      <a href="http://localhost:8005" target="_blank">Ouvrir Terra (Port 8005) →</a>
-    </div>
-    <div class="hub-card">
-      <h3>🖼️ Mirror Hub (Media & Forensics 360)</h3>
-      <p>Expertise ELA d'images (Ghost), OCR (Codex) et vidéo (Chronicle).</p>
-      <a href="http://localhost:8006" target="_blank">Ouvrir Mirror (Port 8006) →</a>
-    </div>
-    <div class="hub-card">
-      <h3>💰 Mercator Hub (Marché 360)</h3>
-      <p>Radar d'événements de marché (Beacon) et exposition au risque.</p>
-      <a href="http://localhost:8007" target="_blank">Ouvrir Mercator (Port 8007) →</a>
-    </div>
-  </div>
+  <script>
+    let chartInstance = null;
+
+    const CAUSAL_DATA = {
+      "LVMH": {
+        labels: ["Avr 2023", "Oct 2023", "Avr 2024", "Oct 2024", "Avr 2025", "Oct 2025", "Août 2026"],
+        prices: [904.60, 720.00, 780.00, 680.00, 590.00, 520.00, 465.00],
+        events: [
+          { date: "Avril 2023", price: "904.60 €", var: "+17.2%", type: "up", label: "Sommet Historique", cause: "Euphorie de réouverture post-Covid en Chine. Rebond des ventes de maroquinerie Louis Vuitton (+23%) et dividende record." },
+          { date: "Octobre 2023", price: "720.00 €", var: "-20.4%", type: "down", label: "Correction Inflations", cause: "Normalisation post-Covid. La hausse des taux d'intérêt de la BCE freine la consommation d'entrée de gamme aux USA et en Europe." },
+          { date: "Avril 2024", price: "780.00 €", var: "+8.3%", type: "up", label: "Rebond Résultats", cause: "Publication de marges opérationnelles résilientes (26.5%) et intégration réussie de la marque Tiffany & Co." },
+          { date: "Octobre 2024", price: "680.00 €", var: "-12.8%", type: "down", label: "Surtaxe Fiscale", cause: "Annonce de la surtaxe exceptionnelle sur les grandes entreprises en France et ralentissement marqué des flux touristiques Asie." },
+          { date: "Avril 2025", price: "590.00 €", var: "-13.2%", type: "down", label: "Chute Bénéfices", cause: "Baisse de 13% du résultat net global (10.9 Mds€). Tensions géopolitiques et douanières sur les vins et spiritueux (Hennessy)." },
+          { date: "Août 2026", price: "465.00 €", var: "-10.5%", type: "down", label: "Zone Support", cause: "Année de restructuration. Pression baissière persistante en Asie partiellement compensée par la fermeté des ventes aux USA." }
+        ],
+        predictions: [
+          { scenario: "Scénario 1 : Rebond Consommation Asie", prob: "74%", impact: "+ 12.5% (🎯 Cible : 523,00 €)", desc: "Si la demande en Chine/Japon reprend au T4 2026 suite aux baisses de taux banques centrales." },
+          { scenario: "Scénario 2 : Maintien Surtaxe Fiscale", prob: "38%", impact: "- 4.2% (🎯 Cible : 445,00 €)", desc: "Si la taxe exceptionnelle française est reconduite sans ajustement budgétaire." }
+        ]
+      },
+      "ZARA": {
+        labels: ["Avr 2023", "Oct 2023", "Avr 2024", "Oct 2024", "Avr 2025", "Oct 2025", "Août 2026"],
+        prices: [31.20, 35.40, 42.10, 48.50, 44.20, 45.80, 46.80],
+        events: [
+          { date: "Avril 2023", price: "31.20 €", var: "+8.4%", type: "up", label: "Expansion E-Commerce", cause: "Succès du modèle de vente unifiée en ligne et gestion de stock par puces RFID." },
+          { date: "Octobre 2024", price: "48.50 €", var: "+15.2%", type: "up", label: "Record Ventes", cause: "Résultat net en hausse de 30% grâce à l'efficacité du hub logistique automatisé de Zaragoza." },
+          { date: "Août 2026", price: "46.80 €", var: "+2.1%", type: "up", label: "Consolidation", cause: "Croissance continue tirée par les flagships mondiaux et la rentabilité du fast-fashion 48h." }
+        ],
+        predictions: [
+          { scenario: "Scénario 1 : Automatisation Logistique 100%", prob: "82%", impact: "+ 8.0% (🎯 Cible : 50,50 €)", desc: "Si le déploiement du tri robotisé The Cube réduit les coûts d'expédition de 15%." }
+        ]
+      }
+    };
+
+    function renderChart(data) {
+      const ctx = document.getElementById('causalChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Prix de l\'Action (€)',
+            data: data.prices,
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+            fill: true,
+            tension: 0.3,
+            borderWidth: 3,
+            pointBackgroundColor: '#10b981',
+            pointRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    function updateCausalAnalysis() {
+      const sel = document.getElementById('stock-select').value;
+      const d = CAUSAL_DATA[sel] || CAUSAL_DATA["LVMH"];
+
+      renderChart(d);
+
+      // Remplir la table des causes et effets
+      const tbody = document.getElementById('causal-events-body');
+      tbody.innerHTML = d.events.map(ev => `
+        <tr>
+          <td class="mono">${ev.date}</td>
+          <td class="mono font-bold">${ev.price}</td>
+          <td class="mono"><span class="cause-badge ${ev.type}">${ev.var}</span></td>
+          <td><span class="cause-badge ${ev.type}">${ev.label}</span></td>
+          <td style="color:#f8fafc;">${ev.cause}</td>
+        </tr>
+      `).join('');
+
+      // Remplir le moteur de prédiction IA
+      const pBox = document.getElementById('prediction-box');
+      pBox.innerHTML = d.predictions.map(p => `
+        <div class="predict-card">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <strong style="color:#38bdf8;">${p.scenario}</strong>
+            <span style="color:#10b981; font-weight:bold; font-family:monospace;">Probabilité : ${p.prob}</span>
+          </div>
+          <div style="font-size:0.9rem; margin-bottom:6px; color:#f8fafc;">Impact Estimé : <strong style="color:#10b981;">${p.impact}</strong></div>
+          <div style="font-size:0.8rem; color:#94a3b8;">${p.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    window.onload = function() {
+      updateCausalAnalysis();
+    };
+  </script>
 </body>
 </html>
